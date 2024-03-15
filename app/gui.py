@@ -1,8 +1,8 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QMessageBox, QLineEdit, QLabel, QVBoxLayout
 
+from crypto.rsa import RSAKeys
 from crypto.signing import DocumentSigner
 import os
-from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from hashlib import sha256
@@ -89,18 +89,8 @@ class TTPApp(QWidget):
             QMessageBox.warning(self, 'Empty Key Name', 'Please enter a name for the RSA keys.')
             return
 
-        key = RSA.generate(4096)
-
-        private_key_path = f'{key_name}_private_key.pem'
-        public_key_path = f'{key_name}_public_key.pem'
-
-        with open(private_key_path, 'wb') as private_key_file:
-            private_key_file.write(key.export_key())
-
-        with open(public_key_path, 'wb') as public_key_file:
-            public_key_file.write(key.publickey().export_key())
-
-        QMessageBox.information(self, 'RSA Keys Generated', f'RSA keys generated for User A. Private key saved as "{private_key_path}".')
+        RSAKeys.create(key_name)
+        QMessageBox.information(self, 'Success', 'RSA Keys Generated.')
 
     def encrypt_private_key(self):
         pin = self.pin_input.text()
