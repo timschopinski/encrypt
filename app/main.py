@@ -2,7 +2,9 @@ import sys
 import argparse
 import unittest
 from PyQt6.QtWidgets import QApplication
-from gui import SignatureApp, TTPApp
+from gui.signature import SignatureWindow
+from gui.ttp import TTPWindow
+from gui.main import MainWindow
 
 
 def parse_arguments():
@@ -10,7 +12,7 @@ def parse_arguments():
     parser.add_argument(
         '--app',
         choices=['signature', 'ttp'],
-        default='signature',
+        default='menu',
         required=False,
         help='Choose "signature" to open the signature application or '
              '"ttp" to open the trusted third party application. Default is "signature".'
@@ -32,10 +34,13 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
 
-    tool = None
-    if args.app == 'signature':
-        tool = SignatureApp()
-    elif args.app == 'ttp':
-        tool = TTPApp()
-    tool.show()
+    match args.app:
+        case 'signature':
+            window = SignatureWindow()
+        case 'ttp':
+            window = TTPWindow()
+        case _:
+            window = MainWindow()
+
+    window.show()
     sys.exit(app.exec())
