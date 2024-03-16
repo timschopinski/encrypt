@@ -22,3 +22,8 @@ class RSAKeys:
         private_key_path = os.path.join(save_directory, f'{key_name}_private_key.pem')
         public_key_path = os.path.join(save_directory, f'{key_name}_public_key.pem')
         return private_key_path, public_key_path
+
+    @staticmethod
+    def load_key(key_path: str) -> RSA:
+        with open(key_path, 'rb') as public_key_file:
+            return RSA.import_key(public_key_file.read())

@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QWidget, QPushButton, QFileDialog, QMessageBox, QLin
 from crypto.rsa import RSAKeys
 from crypto.signing import DocumentSigner
 import os
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES, PKCS1_OAEP
 from hashlib import sha256
 
 
@@ -28,6 +28,12 @@ class SignatureApp(QWidget):
         self.decrypt_button.clicked.connect(self.decrypt_file)
         self.decrypt_button.setGeometry(50, 150, 150, 30)
 
+        self.status_label = QLabel(self)
+        self.status_label.setGeometry(50, 200, 300, 30)
+
+    def display_status(self, message):
+        self.status_label.setText(message)
+
     def sign_document(self):
         file_path, _ = QFileDialog.getOpenFileName(self, 'Select Document to Sign', '', 'All Files (*)')
         if file_path:
@@ -43,14 +49,52 @@ class SignatureApp(QWidget):
     def encrypt_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, 'Select File to Encrypt', '', 'All Files (*)')
         if file_path:
-            # TODO: Implement encryption logic here
-            pass
+            rsa = RSAKeys()
 
-    def decrypt_file(self):
+            QMessageBox.information(self, 'Select Public Key', 'Please select the public key for encryption.')
+            public_key_path, _ = QFileDialog.getOpenFileName(self, 'Select Public Key', '', 'Public Key Files (*.pem)')
+            if not public_key_path:
+                self.display_status('Encryption canceled.')
+                return
+
+            public_key = rsa.load_key(public_key_path)
+
+            with open(file_path, 'rb') as f:
+                plaintext = f.read()
+
+            cipher_rsa = PKCS1_OAEP.new(public_key)
+            ciphertext = cipher_rsa.encrypt(plaintext)
+
+            encrypted_file_path, _ = QFileDialog.getSaveFileName(self, 'Save Encrypted File', '', 'All Files (*)')
+            if encrypted_file_path:
+                with open(encrypted_file_path, 'wb') as f:
+                    f.write(ciphertext)
+                self.display_status(f'Encryption Complete')
+
+    def decrypt_file(self, file_path):
         file_path, _ = QFileDialog.getOpenFileName(self, 'Select File to Decrypt', '', 'All Files (*)')
         if file_path:
-            # TODO: Implement decryption logic here
-            pass
+            QMessageBox.information(self, 'Select Private Key', 'Please select the private key for decryption.')
+            rsa = RSAKeys()
+
+            private_key_path, _ = QFileDialog.getOpenFileName(self, 'Select Private Key', '', 'Private Key Files (*.pem)')
+            if not private_key_path:
+                self.display_status('Decryption canceled.')
+                return
+
+            private_key = rsa.load_key(private_key_path)
+
+            with open(file_path, 'rb') as f:
+                ciphertext = f.read()
+
+            cipher_rsa = PKCS1_OAEP.new(private_key)
+            plaintext = cipher_rsa.decrypt(ciphertext)
+
+            decrypted_file_path, _ = QFileDialog.getSaveFileName(self, 'Save Decrypted File', '', 'All Files (*)')
+            if decrypted_file_path:
+                with open(decrypted_file_path, 'wb') as f:
+                    f.write(plaintext)
+                self.display_status(f'Decryption Completed Successfully.')
 
 
 class TTPApp(QWidget):
