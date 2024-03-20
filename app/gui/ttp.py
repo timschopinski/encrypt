@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import QPushButton, QMessageBox, QLineEdit, QLabel
+from PyQt6.QtWidgets import QPushButton, QMessageBox, QLineEdit, QLabel, QDialog
 from crypto.rsa import RSAKeys
 import os
 from Crypto.Cipher import AES
 from hashlib import sha256
 from gui.base import BaseWindow
+from gui.rsa_config import RSAConfigDialog
 
 
 class TTPWindow(BaseWindow):
@@ -12,12 +13,8 @@ class TTPWindow(BaseWindow):
     def initUI(self):
         super().initUI()
 
-        self.key_name_input = QLineEdit(self)
-        self.layout.addWidget(QLabel('Enter name for RSA keys (without extension):'))
-        self.layout.addWidget(self.key_name_input)
-
         self.generate_keys_button = QPushButton('Generate RSA Keys', self)
-        self.generate_keys_button.clicked.connect(self.generate_rsa_keys)
+        self.generate_keys_button.clicked.connect(self.show_rsa_config_dialog)
         self.layout.addWidget(self.generate_keys_button)
 
         self.encrypt_key_button = QPushButton('Encrypt Private Key', self)
@@ -28,15 +25,20 @@ class TTPWindow(BaseWindow):
         self.layout.addWidget(QLabel('Enter User A PIN:'))
         self.layout.addWidget(self.pin_input)
 
-    def generate_rsa_keys(self):
-        key_name = self.key_name_input.text()
-        if not key_name:
-            QMessageBox.warning(self, 'Empty Key Name', 'Please enter a name for the RSA keys.')
-            return
+    def show_rsa_config_dialog(self):
+        dialog = RSAConfigDialog()
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            key_name = dialog.key_name_input.text()
+            bits = int(dialog.bits_combo.currentText())
+            directory = dialog.directory if hasattr(dialog, 'directory') else None
 
-        rsa_keys = RSAKeys()
-        rsa_keys.create(key_name)
-        QMessageBox.information(self, 'Success', 'RSA Keys Generated.')
+            if not key_name:
+                QMessageBox.warning(self, 'Empty Key Name', 'Please enter a name for the RSA keys.')
+                return
+
+            rsa_keys = RSAKeys()
+            rsa_keys.create(key_name, bits, directory)
+            QMessageBox.information(self, 'Success', 'RSA Keys Generated.')
 
     def encrypt_private_key(self):
         pin = self.pin_input.text()
