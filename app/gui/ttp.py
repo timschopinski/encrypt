@@ -1,10 +1,11 @@
-from PyQt6.QtWidgets import QPushButton, QMessageBox, QLineEdit, QLabel, QDialog
+from PyQt6.QtWidgets import QPushButton, QMessageBox, QDialog
 from crypto.rsa import RSAKeys
 import os
 from Crypto.Cipher import AES
 from hashlib import sha256
 from gui.base import BaseWindow
-from gui.rsa_config import RSAConfigDialog
+from gui.dialogs.key_encryption import PrivateKeyEncryptionDialog
+from gui.dialogs.rsa_config import RSAConfigDialog
 
 
 class TTPWindow(BaseWindow):
@@ -13,59 +14,37 @@ class TTPWindow(BaseWindow):
     def initUI(self):
         super().initUI()
 
-        self.generate_keys_button = QPushButton('Generate RSA Keys', self)
-        self.generate_keys_button.clicked.connect(self.show_rsa_config_dialog)
-        self.layout.addWidget(self.generate_keys_button)
+        generate_keys_button = QPushButton('Generate RSA Keys', self)
+        generate_keys_button.clicked.connect(self.show_rsa_config_dialog)
+        self.layout.addWidget(generate_keys_button)
 
-        self.encrypt_key_button = QPushButton('Encrypt Private Key', self)
-        self.encrypt_key_button.clicked.connect(self.encrypt_private_key)
-        self.layout.addWidget(self.encrypt_key_button)
-
-        self.pin_input = QLineEdit(self)
-        self.layout.addWidget(QLabel('Enter User A PIN:'))
-        self.layout.addWidget(self.pin_input)
+        encrypt_key_button = QPushButton('Encrypt Private Key', self)
+        encrypt_key_button.clicked.connect(self.show_encrypt_private_key_dialog)
+        self.layout.addWidget(encrypt_key_button)
 
     def show_rsa_config_dialog(self):
         dialog = RSAConfigDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            key_name = dialog.key_name_input.text()
-            bits = int(dialog.bits_combo.currentText())
-            directory = dialog.directory if hasattr(dialog, 'directory') else None
-
-            if not key_name:
-                QMessageBox.warning(self, 'Empty Key Name', 'Please enter a name for the RSA keys.')
-                return
-
             rsa_keys = RSAKeys()
-            rsa_keys.create(key_name, bits, directory)
+            rsa_keys.create(dialog.key, dialog.bits, dialog.directory)
             QMessageBox.information(self, 'Success', 'RSA Keys Generated.')
 
-    def encrypt_private_key(self):
-        pin = self.pin_input.text()
-        if not pin:
-            QMessageBox.warning(self, 'Empty PIN', 'Please enter a PIN.')
-            return
+    def show_encrypt_private_key_dialog(self):
+        dialog = PrivateKeyEncryptionDialog()
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.encrypt_private_key(dialog.key, dialog.directory, dialog.pin)
 
-        key_name = self.key_name_input.text()
-        if not key_name:
-            QMessageBox.warning(self, 'Empty Key Name', 'Please enter a name for the RSA keys.')
-            return
-
-        private_key_path = f'{key_name}_private_key.pem'
-        if not os.path.exists(private_key_path):
-            QMessageBox.warning(self, 'Private Key Not Found', 'Private key not found. Generate RSA keys first.')
-            return
-
-        with open(private_key_path, 'rb') as private_key_file:
+    def encrypt_private_key(self, key: str, directory: str, pin: str):
+        with open(key, 'rb') as private_key_file:
             private_key_data = private_key_file.read()
 
         aes_key = sha256(pin.encode()).digest()
 
         cipher_aes = AES.new(aes_key, AES.MODE_EAX)
         ciphertext, tag = cipher_aes.encrypt_and_digest(private_key_data)
-
-        encrypted_private_key_path = f'{key_name}_encrypted_private_key.bin'
-        with open(encrypted_private_key_path, 'wb') as encrypted_key_file:
+        key_without_extension = os.path.splitext(os.path.basename(key))[0].replace('_private_key', '')
+        encrypted_private_key_path = f'{key_without_extension}_encrypted_private_key.bin'
+        with open(os.path.join(directory, encrypted_private_key_path), 'wb') as encrypted_key_file:
             [encrypted_key_file.write(x) for x in (cipher_aes.nonce, tag, ciphertext)]
 
         QMessageBox.information(self, 'Private Key Encrypted', f'Private key encrypted with AES and saved as "{encrypted_private_key_path}".')
