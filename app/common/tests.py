@@ -5,6 +5,10 @@ import unittest
 class MediaTestCase(unittest.TestCase):
     MEDIA_DIR = None
 
+    def setUpClass(cls) -> None:
+        if not os.path.exists(cls.MEDIA_DIR):
+            os.makedirs(cls.MEDIA_DIR)
+
     @classmethod
     def tearDownClass(cls) -> None:
         for filename in os.listdir(cls.MEDIA_DIR):

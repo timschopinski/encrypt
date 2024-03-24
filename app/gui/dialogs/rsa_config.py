@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QDialog, QPushButton, QVBoxLayout, QLabel, QLineEdit, QComboBox, QFileDialog
-from crypto.enums import RSAKeyBits
+from crypto.enums import Bits
 
 
 class RSAConfigDialog(QDialog):
@@ -18,7 +18,7 @@ class RSAConfigDialog(QDialog):
         layout.addWidget(self.key_name_input)
 
         self.bits_combo = QComboBox()
-        self.bits_combo.addItems([str(bits.value) for bits in RSAKeyBits])
+        self.bits_combo.addItems([str(bits.value) for bits in Bits])
         layout.addWidget(QLabel('Select number of bits for RSA keys:'))
         layout.addWidget(self.bits_combo)
 

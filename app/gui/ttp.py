@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QPushButton, QMessageBox, QDialog
-from crypto.rsa import RSAKeys
+from crypto.factories import RSAKeyFactory
 import os
 from Crypto.Cipher import AES
 from hashlib import sha256
@@ -25,7 +25,7 @@ class TTPWindow(BaseWindow):
     def show_rsa_config_dialog(self):
         dialog = RSAConfigDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            rsa_keys = RSAKeys()
+            rsa_keys = RSAKeyFactory()
             rsa_keys.create(dialog.key, dialog.bits, dialog.directory)
             QMessageBox.information(self, 'Success', 'RSA Keys Generated.')
 

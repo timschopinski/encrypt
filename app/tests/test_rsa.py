@@ -1,6 +1,6 @@
 import os
 from common.tests import MediaTestCase
-from crypto.rsa import RSAKeys
+from crypto.factories import RSAKeyFactory
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from settings import BASE_DIR
@@ -11,12 +11,13 @@ class TestRSAKeys(MediaTestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        rsa_keys = RSAKeys(cls.MEDIA_DIR)
+        super().setUpClass(cls)
+        rsa_factory = RSAKeyFactory(cls.MEDIA_DIR)
         key_name = 'test'
-        rsa_keys.create(key_name)
+        rsa_factory.create(key_name)
 
-        cls.private_key_path = os.path.join(cls.MEDIA_DIR, f'{key_name}_private_key.pem')
-        cls.public_key_path = os.path.join(cls.MEDIA_DIR, f'{key_name}_public_key.pem')
+        cls.private_key_path = os.path.join(cls.MEDIA_DIR, f'{key_name}_rsa_private_key.pem')
+        cls.public_key_path = os.path.join(cls.MEDIA_DIR, f'{key_name}_rsa_public_key.pem')
 
     def test_rsa_keys_creates_keys(self):
         self.assertTrue(os.path.exists(self.private_key_path))
