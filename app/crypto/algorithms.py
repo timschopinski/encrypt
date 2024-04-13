@@ -26,7 +26,6 @@ class Algorithm(ABC):
 
 
 class RsaAlgorithm(Algorithm):
-
     @classmethod
     def generate(cls, bits: int):
         return RSA.generate(bits)
@@ -37,7 +36,6 @@ class RsaAlgorithm(Algorithm):
 
 
 class DsaAlgorithm(Algorithm):
-
     @classmethod
     def generate(cls, bits: int):
         return DSA.generate(bits)

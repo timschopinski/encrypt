@@ -2,6 +2,7 @@ import os
 from abc import ABC
 
 from crypto.algorithms import Algorithm, RsaAlgorithm, DsaAlgorithm
+from .enums import Algorithm as AlgorithmEnum
 
 
 class AsymmetricKeyFactory(ABC):
@@ -33,3 +34,15 @@ class RSAKeyFactory(AsymmetricKeyFactory):
 
 class DSAKeyFactory(AsymmetricKeyFactory):
     algorithm = DsaAlgorithm
+
+
+class GenericKeyFactory:
+    @staticmethod
+    def create(algorithm: AlgorithmEnum, key_name: str, bits: int = 4096, directory: str = None) -> None:
+        factory_mapping = {
+            AlgorithmEnum.RSA: RSAKeyFactory,
+            AlgorithmEnum.DSA: DSAKeyFactory,
+        }
+
+        factory_class = factory_mapping[algorithm]
+        factory_class().create(key_name, bits, directory)

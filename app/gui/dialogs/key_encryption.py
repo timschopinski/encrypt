@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QComboBox, QPushButton, QLabel, QLineEdit, QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QLineEdit, QFileDialog
 
 
 class PrivateKeyEncryptionDialog(QDialog):
@@ -45,13 +45,13 @@ class PrivateKeyEncryptionDialog(QDialog):
     def select_key(self):
         file_dialog = QFileDialog(self)
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-        file_dialog.setNameFilter('RSA Private Key (*.pem)')
+        file_dialog.setNameFilter('Private Key (*.pem)')
         if file_dialog.exec() == QFileDialog.DialogCode.Accepted:
             selected_files = file_dialog.selectedFiles()
             if selected_files:
                 self.key = selected_files[0]
 
-    def post_validate(self):
+    def extract_values(self):
         self.pin = self.pin_input.text()
 
     def validate(self):
@@ -68,5 +68,5 @@ class PrivateKeyEncryptionDialog(QDialog):
             self.error_label.setText('Private Key Not Found')
             return
 
-        self.post_validate()
+        self.extract_values()
         self.accept()
