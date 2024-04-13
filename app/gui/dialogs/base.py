@@ -31,7 +31,7 @@ class BaseDialog(QDialog):
 
     def show_error(self, message):
         self.error_label.setText(message)
-        self.error_label.setStyleSheet("color: red;")
+        self.error_label.setStyleSheet('color: red;')
 
     def validate(self, conditions):
         for condition, error_message in conditions:
