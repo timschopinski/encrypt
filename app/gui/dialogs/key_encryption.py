@@ -1,18 +1,13 @@
+from PyQt6.QtWidgets import QPushButton, QLineEdit, QLabel
+from .base import BaseDialog
 import os
 
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QLineEdit, QFileDialog
 
-
-class PrivateKeyEncryptionDialog(QDialog):
+class PrivateKeyEncryptionDialog(BaseDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__('Encrypt Private Key')
 
-        self.setWindowTitle('Encrypt Private Key')
-
-        layout = QVBoxLayout()
-
-        self.error_label = QLabel()
-        layout.addWidget(self.error_label)
+        layout = self.layout()
 
         self.select_key_button = QPushButton('Select Key')
         self.select_key_button.clicked.connect(self.select_key)
@@ -28,49 +23,28 @@ class PrivateKeyEncryptionDialog(QDialog):
         layout.addWidget(self.directory_button)
 
         encrypt_button = QPushButton('Encrypt')
-        encrypt_button.clicked.connect(self.validate)
+        encrypt_button.clicked.connect(self.validate_and_accept)
         layout.addWidget(encrypt_button)
-
-        self.setLayout(layout)
 
         self.key = None
         self.pin = None
         self.directory = None
 
-    def choose_directory(self):
-        directory = QFileDialog.getExistingDirectory(self, 'Choose Directory')
-        if directory:
-            self.directory = directory
-
     def select_key(self):
-        file_dialog = QFileDialog(self)
-        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-        file_dialog.setNameFilter('Private Key (*.pem)')
-        if file_dialog.exec() == QFileDialog.DialogCode.Accepted:
-            selected_files = file_dialog.selectedFiles()
-            if selected_files:
-                self.key = selected_files[0]
+        self.key = self.select_file('Private Key (*.pem)')
+        if not self.key:
+            self.show_error('Please select a private key file.')
 
     def extract_values(self):
         self.pin = self.pin_input.text()
 
-    def validate(self):
-        if not self.key:
-            self.show_error('Please select a private key file.')
-            return
-        if not self.directory:
-            self.show_error('Please select a directory.')
-            return
-        if not self.pin_input.text():
-            self.show_error('Please enter a PIN.')
-            return
-        if not os.path.exists(self.key):
-            self.show_error('Private Key Not Found')
-            return
-
-        self.extract_values()
-        self.accept()
-
-    def show_error(self, message):
-        self.error_label.setText(message)
-        self.error_label.setStyleSheet("color: red;")
+    def validate_and_accept(self):
+        conditions = [
+            (lambda: self.key, 'Please select a private key file.'),
+            (lambda: self.directory, 'Please select a directory.'),
+            (lambda: self.pin_input.text(), 'Please enter a PIN.'),
+            (lambda: os.path.exists(self.key), 'Private Key Not Found')
+        ]
+        if self.validate(conditions):
+            self.extract_values()
+            self.accept()

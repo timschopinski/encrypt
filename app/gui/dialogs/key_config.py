@@ -1,17 +1,13 @@
-from PyQt6.QtWidgets import QDialog, QPushButton, QVBoxLayout, QLabel, QLineEdit, QComboBox, QFileDialog
+from PyQt6.QtWidgets import QPushButton, QLabel, QLineEdit, QComboBox
+from .base import BaseDialog
 from crypto.enums import Algorithm, RSABits, DSABits
 
 
-class KeyConfigDialog(QDialog):
+class KeyConfigDialog(BaseDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__('Key Generation Configuration')
 
-        self.setWindowTitle('Key Generation Configuration')
-
-        layout = QVBoxLayout()
-
-        self.error_label = QLabel()
-        layout.addWidget(self.error_label)
+        layout = self.layout()
 
         self.algorithm_combo = QComboBox()
         self.algorithm_combo.addItems([algorithm for algorithm in Algorithm])
@@ -33,10 +29,8 @@ class KeyConfigDialog(QDialog):
         layout.addWidget(self.directory_button)
 
         self.generate_button = QPushButton('Generate Keys')
-        self.generate_button.clicked.connect(self.validate)
+        self.generate_button.clicked.connect(self.validate_and_accept)
         layout.addWidget(self.generate_button)
-
-        self.setLayout(layout)
 
         self.key = None
         self.bits = None
@@ -48,23 +42,6 @@ class KeyConfigDialog(QDialog):
         self.algorithm = self.algorithm_combo.currentText()
         self.key = self.key_name_input.text()
 
-    def choose_directory(self):
-        directory = QFileDialog.getExistingDirectory(self, 'Choose Directory')
-        if directory:
-            self.directory = directory
-
-    def validate(self):
-        if not self.directory:
-            self.show_error('Please select a directory.')
-            return
-
-        if not self.key_name_input.text():
-            self.show_error('Please enter a key name.')
-            return
-
-        self.extract_values()
-        self.accept()
-
     def update_bits_combo(self):
         self.bits_combo.clear()
         selected_algorithm = self.algorithm_combo.currentText()
@@ -75,6 +52,11 @@ class KeyConfigDialog(QDialog):
         else:
             self.bits_combo.addItems([str(bits.value) for bits in RSABits])
 
-    def show_error(self, message):
-        self.error_label.setText(message)
-        self.error_label.setStyleSheet("color: red;")
+    def validate_and_accept(self):
+        conditions = [
+            (lambda: self.directory, 'Please select a directory.'),
+            (lambda: self.key_name_input.text(), 'Please enter a key name.')
+        ]
+        if self.validate(conditions):
+            self.extract_values()
+            self.accept()
