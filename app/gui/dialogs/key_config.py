@@ -55,11 +55,11 @@ class KeyConfigDialog(QDialog):
 
     def validate(self):
         if not self.directory:
-            self.error_label.setText('Please select a directory.')
+            self.show_error('Please select a directory.')
             return
 
         if not self.key_name_input.text():
-            self.error_label.setText('Please enter a key name.')
+            self.show_error('Please enter a key name.')
             return
 
         self.extract_values()
@@ -74,3 +74,7 @@ class KeyConfigDialog(QDialog):
             self.bits_combo.addItems([str(bits.value) for bits in DSABits])
         else:
             self.bits_combo.addItems([str(bits.value) for bits in RSABits])
+
+    def show_error(self, message):
+        self.error_label.setText(message)
+        self.error_label.setStyleSheet("color: red;")

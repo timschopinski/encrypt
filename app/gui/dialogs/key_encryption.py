@@ -56,17 +56,21 @@ class PrivateKeyEncryptionDialog(QDialog):
 
     def validate(self):
         if not self.key:
-            self.error_label.setText('Please select a private key file.')
+            self.show_error('Please select a private key file.')
             return
         if not self.directory:
-            self.error_label.setText('Please select a directory.')
+            self.show_error('Please select a directory.')
             return
         if not self.pin_input.text():
-            self.error_label.setText('Please enter a PIN.')
+            self.show_error('Please enter a PIN.')
             return
         if not os.path.exists(self.key):
-            self.error_label.setText('Private Key Not Found')
+            self.show_error('Private Key Not Found')
             return
 
         self.extract_values()
         self.accept()
+
+    def show_error(self, message):
+        self.error_label.setText(message)
+        self.error_label.setStyleSheet("color: red;")
