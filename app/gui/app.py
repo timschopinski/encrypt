@@ -12,17 +12,17 @@ class AppWindow(BaseWindow):
     def initUI(self):
         super().initUI()
 
-        self.sign_button = QPushButton('Sign Document', self)
-        self.sign_button.clicked.connect(self.sign_document)
-        self.layout.addWidget(self.sign_button)
+        sign_button = QPushButton('Sign Document', self)
+        sign_button.clicked.connect(self.sign_document)
+        self.layout.addWidget(sign_button)
 
-        self.encrypt_button = QPushButton('Encrypt File', self)
-        self.encrypt_button.clicked.connect(self.encrypt_file)
-        self.layout.addWidget(self.encrypt_button)
+        encrypt_button = QPushButton('Encrypt File', self)
+        encrypt_button.clicked.connect(self.encrypt_file)
+        self.layout.addWidget(encrypt_button)
 
-        self.decrypt_button = QPushButton('Decrypt File', self)
-        self.decrypt_button.clicked.connect(self.decrypt_file)
-        self.layout.addWidget(self.decrypt_button)
+        decrypt_button = QPushButton('Decrypt File', self)
+        decrypt_button.clicked.connect(self.decrypt_file)
+        self.layout.addWidget(decrypt_button)
 
         self.status_label = QLabel(self)
         self.layout.addWidget(self.status_label)
