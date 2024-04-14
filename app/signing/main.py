@@ -1,10 +1,11 @@
-from PyQt6.QtWidgets import QPushButton, QFileDialog, QMessageBox, QLabel, QDialog
+from PyQt6.QtWidgets import QPushButton, QLabel, QDialog, QMessageBox
 from signing.backend.handlers import EncryptFileHandler, DecryptFileHandler
-from signing.backend.signing import DocumentSigner
+from signing.backend.signing import DocumentSigner, SignatureValidator
 from common.windows.base import BaseWindow
 from signing.dialog.decrypt_file import DecryptFileDialog
 from signing.dialog.encrypt_file import EncryptFileDialog
 from signing.dialog.sign_document import SignDocumentDialog
+from signing.dialog.signature_validation import ValidateSignatureDialog
 
 
 class SigningWindow(BaseWindow):
@@ -16,6 +17,10 @@ class SigningWindow(BaseWindow):
         sign_button = QPushButton('Sign Document', self)
         sign_button.clicked.connect(self.sign_document)
         self.layout.addWidget(sign_button)
+
+        validate_button = QPushButton('Validate Signature', self)
+        validate_button.clicked.connect(self.validate_signature)
+        self.layout.addWidget(validate_button)
 
         encrypt_button = QPushButton('Encrypt File', self)
         encrypt_button.clicked.connect(self.encrypt_file)
@@ -40,6 +45,22 @@ class SigningWindow(BaseWindow):
             else:
                 self.display_status('Signature failed.')
 
+    def validate_signature(self):
+        dialog = ValidateSignatureDialog()
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            values = dialog.extract_values()
+            document_path = values['document_path']
+            xml_signature_path = values['xml_signature_path']
+            public_key_path = values['public_key_path']
+
+            validator = SignatureValidator()
+            is_valid, document_info = validator.validate_signature(document_path, xml_signature_path, public_key_path)
+
+            if is_valid:
+                message = f'Signature is valid.\n{document_info}'
+                QMessageBox.information(self, 'Success', message)
+            else:
+                self.display_status('Signature Validation failed.')
 
     def encrypt_file(self):
         dialog = EncryptFileDialog()
