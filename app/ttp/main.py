@@ -25,11 +25,13 @@ class TTPWindow(BaseWindow):
     def show_key_config_dialog(self):
         dialog = KeyConfigDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            GenericKeyFactory.create(dialog.algorithm, dialog.key, dialog.bits, dialog.directory)
-            QMessageBox.information(self, 'Success', f'{dialog.algorithm} Keys Generated.')
+            algorithm, key, bits, directory = dialog.extract_values().values()
+            GenericKeyFactory.create(algorithm, key, bits, directory)
+            QMessageBox.information(self, 'Success', f'{algorithm} Keys Generated.')
 
     def show_encrypt_private_key_dialog(self):
         dialog = PrivateKeyEncryptionDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            PrivateKeyEncryptor.encrypt(dialog.key, dialog.directory, dialog.pin)
+            key, directory, pin = dialog.extract_values().values()
+            PrivateKeyEncryptor.encrypt(key, directory, pin)
             QMessageBox.information(self, 'Success', 'Private Key Encrypted')

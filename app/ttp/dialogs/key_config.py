@@ -9,54 +9,51 @@ class KeyConfigDialog(BaseDialog):
 
         layout = self.layout()
 
-        self.algorithm_combo = QComboBox()
-        self.algorithm_combo.addItems([algorithm for algorithm in Algorithm])
-        self.algorithm_combo.currentIndexChanged.connect(self.update_bits_combo)
+        self._algorithm_combo = QComboBox()
+        self._algorithm_combo.addItems([algorithm for algorithm in Algorithm])
+        self._algorithm_combo.currentIndexChanged.connect(self._update_bits_combo)
         layout.addWidget(QLabel('Select algorithm:'))
-        layout.addWidget(self.algorithm_combo)
+        layout.addWidget(self._algorithm_combo)
 
-        self.key_name_input = QLineEdit()
+        self._key_name_input = QLineEdit()
         layout.addWidget(QLabel('Enter name for keys (without extension):'))
-        layout.addWidget(self.key_name_input)
+        layout.addWidget(self._key_name_input)
 
-        self.bits_combo = QComboBox()
-        self.update_bits_combo()
+        self._bits_combo = QComboBox()
+        self._update_bits_combo()
         layout.addWidget(QLabel('Select number of bits for keys:'))
-        layout.addWidget(self.bits_combo)
+        layout.addWidget(self._bits_combo)
 
-        self.directory_button = QPushButton('Choose Directory')
-        self.directory_button.clicked.connect(self.choose_directory)
-        layout.addWidget(self.directory_button)
+        directory_button = QPushButton('Choose Directory')
+        directory_button.clicked.connect(self._choose_directory)
+        layout.addWidget(directory_button)
 
-        self.generate_button = QPushButton('Generate Keys')
-        self.generate_button.clicked.connect(self.validate_and_accept)
-        layout.addWidget(self.generate_button)
-
-        self.key = None
-        self.bits = None
-        self.algorithm = None
-        self.directory = None
+        generate_button = QPushButton('Generate Keys')
+        generate_button.clicked.connect(self._validate_and_accept)
+        layout.addWidget(generate_button)
 
     def extract_values(self):
-        self.bits = int(self.bits_combo.currentText())
-        self.algorithm = self.algorithm_combo.currentText()
-        self.key = self.key_name_input.text()
+        return {
+            'algorithm': self._algorithm_combo.currentText(),
+            'key': self._key_name_input.text(),
+            'bits': int(self._bits_combo.currentText()),
+            'directory': self._directory,
+        }
 
-    def update_bits_combo(self):
-        self.bits_combo.clear()
-        selected_algorithm = self.algorithm_combo.currentText()
+    def _update_bits_combo(self):
+        self._bits_combo.clear()
+        selected_algorithm = self._algorithm_combo.currentText()
         if selected_algorithm == Algorithm.RSA:
-            self.bits_combo.addItems([str(bits.value) for bits in RSABits])
+            self._bits_combo.addItems([str(bits.value) for bits in RSABits])
         elif selected_algorithm == Algorithm.DSA:
-            self.bits_combo.addItems([str(bits.value) for bits in DSABits])
+            self._bits_combo.addItems([str(bits.value) for bits in DSABits])
         else:
-            self.bits_combo.addItems([str(bits.value) for bits in RSABits])
+            self._bits_combo.addItems([str(bits.value) for bits in RSABits])
 
-    def validate_and_accept(self):
+    def _validate_and_accept(self):
         conditions = [
-            (lambda: self.directory, 'Please select a directory.'),
-            (lambda: self.key_name_input.text(), 'Please enter a key name.')
+            (lambda: self._directory, 'Please select a directory.'),
+            (lambda: self._key_name_input.text(), 'Please enter a key name.')
         ]
-        if self.validate(conditions):
-            self.extract_values()
+        if self._validate(conditions):
             self.accept()

@@ -1,0 +1,4 @@
+
+
+class DocumentSigningError(Exception):
+    pass

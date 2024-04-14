@@ -14,7 +14,7 @@ class PrivateKeyEncryptor:
         ciphertext, tag = cipher_aes.encrypt_and_digest(private_key_data)
 
         key_without_extension = os.path.splitext(os.path.basename(private_key_path))[0].replace('_private_key', '')
-        encrypted_private_key_path = f'{key_without_extension}_encrypted_private_key.bin'
+        encrypted_private_key_path = f'{key_without_extension}_encrypted_private_key.pem'
 
         with open(os.path.join(directory, encrypted_private_key_path), 'wb') as encrypted_key_file:
             [encrypted_key_file.write(x) for x in (cipher_aes.nonce, tag, ciphertext)]

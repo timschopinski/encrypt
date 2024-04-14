@@ -1,8 +1,11 @@
-import os
-from PyQt6.QtWidgets import QDialog, QPushButton, QVBoxLayout, QLabel, QLineEdit, QFileDialog
+from typing import Any
+
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QFileDialog
 
 
 class BaseDialog(QDialog):
+    validators = None
+
     def __init__(self, title):
         super().__init__()
 
@@ -14,13 +17,17 @@ class BaseDialog(QDialog):
         layout.addWidget(self.error_label)
 
         self.setLayout(layout)
+        self._directory = None
 
-    def choose_directory(self):
+    def extract_values(self) -> dict[str, Any]:
+        pass
+
+    def _choose_directory(self):
         directory = QFileDialog.getExistingDirectory(self, 'Choose Directory')
         if directory:
-            self.directory = directory
+            self._directory = directory
 
-    def select_file(self, name_filter):
+    def _select_file(self, name_filter):
         file_dialog = QFileDialog(self)
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
         file_dialog.setNameFilter(name_filter)
@@ -29,13 +36,13 @@ class BaseDialog(QDialog):
             if selected_files:
                 return selected_files[0]
 
-    def show_error(self, message):
+    def _show_error(self, message):
         self.error_label.setText(message)
         self.error_label.setStyleSheet('color: red;')
 
-    def validate(self, conditions):
+    def _validate(self, conditions):
         for condition, error_message in conditions:
             if not condition():
-                self.show_error(error_message)
+                self._show_error(error_message)
                 return False
         return True
