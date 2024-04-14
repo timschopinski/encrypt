@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QPushButton, QLabel, QLineEdit, QComboBox
-from .base import BaseDialog
-from crypto.enums import Algorithm, RSABits, DSABits
+from common.dialogs.base import BaseDialog
+from common.backend.enums import Algorithm, RSABits, DSABits
 
 
 class KeyConfigDialog(BaseDialog):

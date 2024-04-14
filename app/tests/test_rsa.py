@@ -1,9 +1,9 @@
 import os
 from common.tests import MediaTestCase
-from crypto.factories import RSAKeyFactory
+from ttp.backend.factories import RSAKeyFactory
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
-from settings import BASE_DIR
+from app.settings import BASE_DIR
 
 
 class TestRSAKeys(MediaTestCase):

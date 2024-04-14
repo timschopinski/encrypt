@@ -1,12 +1,12 @@
 from PyQt6.QtWidgets import QPushButton, QFileDialog, QMessageBox, QLabel
 
-from crypto.algorithms import RsaAlgorithm
-from crypto.signing import DocumentSigner
+from common.backend.algorithms import RsaAlgorithm
+from signing.backend.signing import DocumentSigner
 from Crypto.Cipher import PKCS1_OAEP
-from gui.base import BaseWindow
+from common.windows.base import BaseWindow
 
 
-class AppWindow(BaseWindow):
+class SigningWindow(BaseWindow):
     window_title = 'Signature Tool'
 
     def initUI(self):

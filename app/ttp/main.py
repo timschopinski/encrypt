@@ -1,11 +1,11 @@
 from PyQt6.QtWidgets import QPushButton, QMessageBox, QDialog
 
-from crypto.encryption import PrivateKeyEncryptor
-from crypto.factories import GenericKeyFactory
+from ttp.backend.encryption import PrivateKeyEncryptor
+from ttp.backend.factories import GenericKeyFactory
 
-from gui.base import BaseWindow
-from gui.dialogs.key_encryption import PrivateKeyEncryptionDialog
-from gui.dialogs.key_config import KeyConfigDialog
+from common.windows.base import BaseWindow
+from ttp.dialogs.key_encryption import PrivateKeyEncryptionDialog
+from ttp.dialogs.key_config import KeyConfigDialog
 
 
 class TTPWindow(BaseWindow):

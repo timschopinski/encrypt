@@ -1,8 +1,8 @@
 import os
 from abc import ABC
 
-from crypto.algorithms import Algorithm, RsaAlgorithm, DsaAlgorithm
-from .enums import Algorithm as AlgorithmEnum
+from common.backend.algorithms import Algorithm, RsaAlgorithm, DsaAlgorithm
+from common.backend.enums import Algorithm as AlgorithmEnum
 
 
 class AsymmetricKeyFactory(ABC):

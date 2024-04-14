@@ -2,9 +2,9 @@ import sys
 import argparse
 import unittest
 from PyQt6.QtWidgets import QApplication
-from gui.app import AppWindow
-from gui.ttp import TTPWindow
-from gui.main import MainWindow
+from signing.main import SigningWindow
+from ttp.main import TTPWindow
+from app.main import MainWindow
 
 
 def parse_arguments():
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     match args.app:
         case 'app':
-            window = AppWindow()
+            window = SigningWindow()
         case 'ttp':
             window = TTPWindow()
         case _:
