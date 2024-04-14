@@ -45,7 +45,8 @@ class PrivateKeyEncryptionDialog(BaseDialog):
             (lambda: self._key, 'Please select a private key file.'),
             (lambda: self._directory, 'Please select a directory.'),
             (lambda: self._pin_input.text(), 'Please enter a PIN.'),
-            (lambda: os.path.exists(self._key), 'Private Key Not Found')
+            (lambda: os.path.exists(self._key), 'Private Key Not Found'),
+            (lambda: os.path.exists(self._directory), 'Directory Not Found')
         ]
         if self._validate(conditions):
             self.accept()

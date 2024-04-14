@@ -1,3 +1,5 @@
+import os
+
 from PyQt6.QtWidgets import QPushButton, QLabel, QLineEdit, QComboBox
 from common.dialogs.base import BaseDialog
 from common.backend.enums import Algorithm, RSABits, DSABits
@@ -53,6 +55,7 @@ class KeyConfigDialog(BaseDialog):
     def _validate_and_accept(self):
         conditions = [
             (lambda: self._directory, 'Please select a directory.'),
+            (lambda: os.path.exists(self._directory), 'Directory Not Found'),
             (lambda: self._key_name_input.text(), 'Please enter a key name.')
         ]
         if self._validate(conditions):
