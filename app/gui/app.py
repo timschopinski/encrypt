@@ -6,7 +6,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from gui.base import BaseWindow
 
 
-class SignatureWindow(BaseWindow):
+class AppWindow(BaseWindow):
     window_title = 'Signature Tool'
 
     def initUI(self):
