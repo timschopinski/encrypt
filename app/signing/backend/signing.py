@@ -9,31 +9,29 @@ from Crypto.Hash import SHA256
 from lxml import etree
 import os
 
+from signing.backend.exceptions import DocumentSigningError
+
+
+def get_document_content(document_path: str) -> bytes:
+    with open(document_path, 'rb') as file:
+        document_content = file.read()
+    return document_content
+
 
 class DocumentSigner:
     def __init__(self, encrypted_private_key_path: str):
         self.encrypted_private_key_path = encrypted_private_key_path
 
     def sign_document(self, file_path: str, pin: str, username: str) -> tuple[bytes | None, bool]:
-        try:
-            private_key = self._get_private_key(pin)
-            document_content = self._get_document_content(file_path)
-            document_hash = SHA256.new(document_content)
-            cipher_rsa = PKCS1_v1_5.new(private_key)
-            encrypted_hash = cipher_rsa.sign(document_hash)
+        private_key = self._get_private_key(pin)
+        document_content = get_document_content(file_path)
+        document_hash = SHA256.new(document_content)
+        cipher_rsa = PKCS1_v1_5.new(private_key)
+        encrypted_hash = cipher_rsa.sign(document_hash)
 
-            xml_signature = self._generate_xml_signature(file_path, encrypted_hash, username)
-            self._save_signature(xml_signature, file_path)
-            return xml_signature, True
-
-        except Exception:
-            return None, False
-
-    @staticmethod
-    def _get_document_content(file_path: str) -> bytes:
-        with open(file_path, 'rb') as file:
-            document_content = file.read()
-        return document_content
+        xml_signature = self._generate_xml_signature(file_path, encrypted_hash, username)
+        self._save_signature(xml_signature, file_path)
+        return xml_signature, True
 
     def _save_signature(self, xml_signature: bytes, file_path: str) -> None:
         signature_file_path = self._generate_signature_file_path(file_path)
@@ -41,15 +39,18 @@ class DocumentSigner:
             signature_file.write(xml_signature)
 
     def _get_private_key(self, pin: str):
-        with open(self.encrypted_private_key_path, 'rb') as key_file:
-            key_data = key_file.read()
-            nonce = key_data[:16]
-            tag = key_data[16:32]
-            ciphertext = key_data[32:]
-            cipher_aes = AES.new(sha256(pin.encode()).digest(), AES.MODE_EAX, nonce=nonce)
-            private_key_data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+        try:
+            with open(self.encrypted_private_key_path, 'rb') as key_file:
+                key_data = key_file.read()
+                nonce = key_data[:16]
+                tag = key_data[16:32]
+                ciphertext = key_data[32:]
+                cipher_aes = AES.new(sha256(pin.encode()).digest(), AES.MODE_EAX, nonce=nonce)
+                private_key_data = cipher_aes.decrypt_and_verify(ciphertext, tag)
 
-        return RSA.import_key(private_key_data)
+            return RSA.import_key(private_key_data)
+        except Exception:
+            raise DocumentSigningError()
 
     @staticmethod
     def _generate_xml_signature(file_path: str, encrypted_hash: bytes, username: str) -> bytes:
@@ -84,9 +85,7 @@ class DocumentSigner:
 class SignatureValidator:
     def validate_signature(self, document_path: str, xml_signature_path: str, public_key_path: str) -> tuple[bool, Any]:
         try:
-            with open(document_path, 'rb') as file:
-                document_content = file.read()
-
+            document_content = get_document_content(document_path)
             document_hash = SHA256.new(document_content)
 
             with open(xml_signature_path, 'r') as xml_file:

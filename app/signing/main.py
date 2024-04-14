@@ -1,4 +1,6 @@
 from PyQt6.QtWidgets import QPushButton, QLabel, QDialog, QMessageBox
+
+from common.backend.exceptions import EncryptException
 from signing.backend.handlers import EncryptFileHandler, DecryptFileHandler
 from signing.backend.signing import DocumentSigner, SignatureValidator
 from common.windows.base import BaseWindow
@@ -38,12 +40,11 @@ class SigningWindow(BaseWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             file_path, encrypted_private_key_path, pin, username = dialog.extract_values().values()
             document_signer = DocumentSigner(encrypted_private_key_path)
-
-            _, created = document_signer.sign_document(file_path, pin, username)
-            if created:
+            try:
+                document_signer.sign_document(file_path, pin, username)
                 self.display_status(f'Signature Completed Successfully.')
-            else:
-                self.display_status('Signature failed.')
+            except EncryptException as e:
+                self.display_status(e.message)
 
     def validate_signature(self):
         dialog = ValidateSignatureDialog()

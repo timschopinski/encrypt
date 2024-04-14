@@ -1,8 +1,13 @@
+from common.backend.exceptions import EncryptException
 
 
-class DocumentSigningError(Exception):
-    pass
+class DocumentSigningError(EncryptException):
+    message = 'Failed to sign the document.'
 
 
-class InvalidPinError(Exception):
-    pass
+class SigningValidationError(EncryptException):
+    message = 'Failed to validate the signing'
+
+
+class InvalidPinError(EncryptException):
+    message = 'Invalid pin provided.'
