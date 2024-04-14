@@ -28,7 +28,7 @@ def parse_arguments():
 if __name__ == '__main__':
     args = parse_arguments()
     if args.test:
-        suite = unittest.TestLoader().discover('tests')
+        suite = unittest.TestLoader().discover('.')
         unittest.TextTestRunner(verbosity=2).run(suite)
         sys.exit()
 

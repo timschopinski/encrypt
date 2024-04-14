@@ -7,7 +7,7 @@ from app.settings import BASE_DIR
 
 
 class TestRSAKeys(MediaTestCase):
-    MEDIA_DIR = os.path.join(BASE_DIR, 'tests', 'media')
+    MEDIA_DIR = os.path.join(BASE_DIR, 'ttp', 'tests', 'media')
 
     @classmethod
     def setUpClass(cls) -> None:

@@ -9,14 +9,14 @@ from ttp.backend.factories import RSAKeyFactory
 
 
 class TestDecryptFile(MediaTestCase):
-    MEDIA_DIR = os.path.join(BASE_DIR, 'tests', 'media')
+    MEDIA_DIR = os.path.join(BASE_DIR, 'signing', 'tests', 'media')
 
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass(cls)
         RSAKeyFactory().create(key_name='test', directory=cls.MEDIA_DIR)
 
-    @patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName', return_value=(os.path.join(BASE_DIR, 'tests', 'media', 'decrypted_test.txt'), 'All Files (*)'))
+    @patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName', return_value=(os.path.join(BASE_DIR, 'signing', 'tests', 'media', 'decrypted_test.txt'), 'All Files (*)'))
     def test_decrypt_file(self, mock_getSaveFileName):
         encrypted_file_path = os.path.join(self.MEDIA_DIR, 'encrypted_test.txt')
         original_message = b'xyz'
