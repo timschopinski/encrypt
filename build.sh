@@ -1,11 +1,24 @@
 #!/bin/bash
 
+system="$1"
+
+if [ $system == "linux" ]; then
+  echo "linux :)"
+  command="-n encrypt --onedir --windowed --icon app/static/icon.icns app/main.py"
+elif [ $system == "windows" ]; then
+  echo "windows :)"
+  command="-n encrypt --onedir --windowed --icon app/static/icon.ico app/main.py"
+else
+  echo "You must specify operating system (windows, linux)"
+  exit 1
+fi
+
 rm -rf encrypt.spec
 rm -rf build
 rm -rf dist
 
 
-pyinstaller -n encrypt --icon app/static/icon.icns --onedir app/main.py
+pyinstaller $command
 
 if [ $? -eq 0 ]; then
     echo "Build successful!"
