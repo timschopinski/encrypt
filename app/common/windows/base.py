@@ -30,7 +30,8 @@ class BaseWindow(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.setContentsMargins(50, 50, 50, 50)
 
-        self.setWindowIcon(QIcon(str(os.path.join(settings.BASE_DIR, 'static', 'icon.png'))))
+        icon_path = os.path.join(settings.BASE_DIR, 'static', 'icon.png')
+        self.setWindowIcon(QIcon(icon_path))
 
     def display_status(self, message):
         self.status_label.setText(message)
