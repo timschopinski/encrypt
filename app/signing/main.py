@@ -11,7 +11,7 @@ from signing.dialog.signature_validation import ValidateSignatureDialog
 
 
 class SigningWindow(BaseWindow):
-    window_title = 'Signature Tool'
+    window_title = 'Signature Application'
 
     def initUI(self):
         super().initUI()
