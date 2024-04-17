@@ -1,5 +1,10 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel
+import os
+
+from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QHBoxLayout
 from PyQt6.QtCore import QRect, QCoreApplication, Qt
+
+from app import settings
 
 
 class BaseWindow(QWidget):
@@ -24,6 +29,8 @@ class BaseWindow(QWidget):
 
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.setContentsMargins(50, 50, 50, 50)
+
+        self.setWindowIcon(QIcon(str(os.path.join(settings.BASE_DIR, 'static', 'icon.png'))))
 
     def display_status(self, message):
         self.status_label.setText(message)

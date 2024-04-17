@@ -1,5 +1,6 @@
 from typing import Any
 
+from PyQt6.QtCore import QCoreApplication, QRect
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QFileDialog
 
 
@@ -8,8 +9,11 @@ class BaseDialog(QDialog):
 
     def __init__(self, title):
         super().__init__()
+        screen_geometry = QCoreApplication.instance().primaryScreen().geometry()
+        widget_geometry = QRect(screen_geometry.width() // 2 - 200, screen_geometry.height() // 2 - 150, 400, 300)
 
         self.setWindowTitle(title)
+        self.setGeometry(widget_geometry)
 
         layout = QVBoxLayout()
 
