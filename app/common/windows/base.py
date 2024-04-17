@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel
-from PyQt6.QtCore import QRect, QCoreApplication
+from PyQt6.QtCore import QRect, QCoreApplication, Qt
 
 
 class BaseWindow(QWidget):
@@ -21,6 +21,9 @@ class BaseWindow(QWidget):
 
         self.status_label = QLabel(self)
         self.layout.addWidget(self.status_label)
+
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.layout.setContentsMargins(50, 50, 50, 50)
 
     def display_status(self, message):
         self.status_label.setText(message)
