@@ -1,14 +1,12 @@
 import datetime
 from typing import Any
-
-from Crypto.Cipher import AES
-from hashlib import sha256
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from lxml import etree
 import os
 
+from common.backend.utils import get_decrypted_private_key
 from signing.backend.exceptions import DocumentSigningError
 
 
@@ -23,7 +21,7 @@ class DocumentSigner:
         self.encrypted_private_key_path = encrypted_private_key_path
 
     def sign_document(self, file_path: str, pin: str, username: str) -> tuple[bytes | None, bool]:
-        private_key = self._get_private_key(pin)
+        private_key = get_decrypted_private_key(self.encrypted_private_key_path, pin, DocumentSigningError())
         document_content = get_document_content(file_path)
         document_hash = SHA256.new(document_content)
         cipher_rsa = PKCS1_v1_5.new(private_key)
@@ -37,20 +35,6 @@ class DocumentSigner:
         signature_file_path = self._generate_signature_file_path(file_path)
         with open(signature_file_path, 'wb') as signature_file:
             signature_file.write(xml_signature)
-
-    def _get_private_key(self, pin: str):
-        try:
-            with open(self.encrypted_private_key_path, 'rb') as key_file:
-                key_data = key_file.read()
-                nonce = key_data[:16]
-                tag = key_data[16:32]
-                ciphertext = key_data[32:]
-                cipher_aes = AES.new(sha256(pin.encode()).digest(), AES.MODE_EAX, nonce=nonce)
-                private_key_data = cipher_aes.decrypt_and_verify(ciphertext, tag)
-
-            return RSA.import_key(private_key_data)
-        except Exception:
-            raise DocumentSigningError()
 
     @staticmethod
     def _generate_xml_signature(file_path: str, encrypted_hash: bytes, username: str) -> bytes:

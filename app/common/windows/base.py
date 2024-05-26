@@ -35,3 +35,6 @@ class BaseWindow(QWidget):
 
     def display_status(self, message):
         self.status_label.setText(message)
+
+    def clear_status(self):
+        self.status_label.setText('')

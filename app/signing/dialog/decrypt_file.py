@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QPushButton, QLineEdit, QLabel
+from PyQt6.QtWidgets import QPushButton, QLabel
 from common.dialogs.base import BaseDialog
 import os
 
